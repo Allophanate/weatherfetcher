@@ -9,10 +9,10 @@ def load_config_file():
     with open("config.json") as config_file:
         config_data = json.load(config_file)
         return config_data
+        
+API_KEY = load_config_file().["api_key"]
+FILE_PATH = load_config_file().["file_path"]
 
-def get_filepath():
-    filepath = ""
-    return filepath
 
 def get_api_key():
     api_key = ""
@@ -24,7 +24,7 @@ def get_timestamp():
     return timestamp
 
 def create_filename():
-    path_to_file = get_filepath()
+    path_to_file = FILE_PATH
     timestamp = get_timestamp()
     filename = path_to_file + timestamp + "raw_data.json"
     return filename
