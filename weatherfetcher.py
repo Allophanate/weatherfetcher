@@ -68,3 +68,5 @@ def fetch_weather():
     # write date to file as json
     with open(filename, 'w') as outfile:
         json.dump(json_data, outfile)
+
+fetch_weather()
