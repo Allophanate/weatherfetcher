@@ -1,13 +1,13 @@
-"""
-this module downloads the current weather for a given location from
-from openweatherbase.org and saves it as a json file.
-It makes use of the requests module for easy API interaction.
-"""
+""" this module downloads the current weather for a given location from 
+from openweatherbase.org and saves it as a json file. It makes use of 
+the requests module for easy API interaction. """
 
 #The requests module allows for easy connection to a web adress, without worrying about connection timeout etc.
 import requests
 #allows the encoding, decoding, writing and reading of json-files
 import json
+
+import os
 
 from datetime import datetime as dt
 
@@ -16,7 +16,9 @@ def load_config_file():
     This function reads a config file in json formatting.
     the parameter-value-pairs are returned as dictionary.
     """
-    with open("config.json") as config_file:
+    #generates the path the script resides in so no relative paths are needed for config.json
+    dir_path = os.path.dirname(__file__)
+    with open(dir_path + "/config.json") as config_file:
         config_data = json.load(config_file)
         return config_data
 
@@ -24,9 +26,9 @@ config_data = load_config_file()
 
 
 # binding of the config parameters to global variables
-API_KEY = config_data.["api_key"]
-FILE_PATH = config_data.["file_path"]
-CITY_ID = config_data.["city_id"]
+API_KEY = config_data["api_key"]
+FILE_PATH = config_data["file_path"]
+CITY_ID = config_data["city_id"]
 
 
 def get_timestamp():
