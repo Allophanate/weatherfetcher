@@ -6,11 +6,14 @@ conn = sqlite3.connect("test.db")
 
 c = conn.cursor()
 
+
 def enter_data():
     cal = input("Enter Calories: ")
     intensity = input("Enter training intensity: ")
     current_date = date.today().strftime("%Y%m%d")
-    c.execute("INSERT INTO fitdata (date, calories, training) VALUES (?,?,?)", (current_date, cal, intensity))
+    c.execute("INSERT INTO fitdata (date, calories, training) VALUES (?,?,?)",
+              (current_date, cal, intensity))
+
 
 # create table
 def main():
@@ -22,4 +25,5 @@ def main():
         print(row)
     conn.close()
 
-main()    
+
+main()
