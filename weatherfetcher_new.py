@@ -40,6 +40,9 @@ DB_PATH = config_data["db_path"]
 
 
 class Weather():
+    """
+    Holds the relevant data about the local weather.
+    """
     def __init__(self, weather, conditions, wind, clouds, name, time):
         self.weather = weather
         self.conditions = conditions
@@ -50,7 +53,15 @@ class Weather():
 
 
 def get_weather():
-    # constructs the correct api adress from the necessary parts
+    """
+    Gathers the current weather data via an api request, saves the relevant
+    Data in a weather opbject and returns the object.
+    First the api adress ist constructed from hardcoded parts and config
+    parameters.
+    Then, using the requests module, data is gathered in a response.
+    The text is decoded as json and the relevant data used as paramters for
+    the weather object constructor.
+    """
     api_adress = ("http://api.openweathermap.org/" +
                   "data/2.5/weather?id=" + CITY_ID + "&APPID=" + API_KEY)
     # actual fetchin of the weather data and get the text
@@ -64,6 +75,15 @@ def get_weather():
 
 
 def write_data_to_db(cursor, weather):
+    """
+    Creates an squlite database if necessary and saves a weather data into it.
+    The fuction takes as parameters an cursor to a squlite database 
+    and a weather object.
+    If the table weather does not exist, it is created. The weather objects
+    attributes are then saved in temporarz variables using typecasting
+    to ensure the correct types before storing them as a new entry into the 
+    database.
+    """
     cursor.execute("""CREATE TABLE IF NOT EXISTS weather (timestamp text primary key, year integer, month integer, day integer, hour integer, temperature real, pressure integer, humidity integer, weather text, weather_detail text, wind_speed real, wind_angle integer, clouds integer, name text)""")
     timestamp = weather.time.strftime("%Y%m%d%H")
     year = weather.time.year
@@ -79,7 +99,7 @@ def write_data_to_db(cursor, weather):
     wind_angle = int(weather.wind["deg"])
     clouds = int(weather.clouds["all"])
     name = str(weather.name)
-    
+   
     cursor.execute("INSERT INTO weather " +
                    "(timestamp, year, month, day, hour, temperature, " +
                    "pressure, humidity, weather, weather_detail, " +
@@ -90,11 +110,19 @@ def write_data_to_db(cursor, weather):
                     wind_angle, clouds, name))
 
 
-connection = sqlite3.connect(DB_PATH)
-cursor = connection.cursor()
-weather = get_weather()
-write_data_to_db(cursor, weather)
-connection.commit()
+if __name__ == "__main__":
+    try:
+        connection = sqlite3.connect(DB_PATH)
+        cursor = connection.cursor()
+        weather = get_weather()
+        write_data_to_db(cursor, weather)
+        connection.commit()
 
-for row in cursor.execute("SELECT * FROM weather"):
-    print(row)
+    except sqlite3.IntegrityError:
+        print("The call happened to soon after the last!\n" +
+              "If calls happen less than 1 hour appart,\n" +
+              "the key is identical!\n")
+
+    finally:
+        for row in cursor.execute("SELECT * FROM weather"):
+            print(row)
